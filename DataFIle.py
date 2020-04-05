@@ -1,6 +1,6 @@
 import sqlite3
 from sqlite3 import Error
-
+import re
 def create_connection(db_file):
     """ create a database connection to a SQLite database """
     conn = None
@@ -25,7 +25,8 @@ def createTestCaseLog(conn):
     sql_create_table = """ CREATE TABLE IF NOT EXISTS test_case_log (
                                         id integer PRIMARY KEY AUTOINCREMENT,
                                         context text,
-                                        lines text
+                                        lines text,
+                                        file text
                                     ); """
  
     # create tables
@@ -35,13 +36,13 @@ def createTestCaseLog(conn):
         print("Error! cannot create the database connection.")
 
  
-def insertSqliteTable(dict):
+def insertSqliteTable(array):
     try:
         conn = create_connection(".DB")
         cursor = conn.cursor()
-        sql ="""insert into test_case_log(context,lines) values """#salary = 10000 where id = 4"""
-        for key in dict:
-            sql +="('"+key+"','"+dict[key]+"'),"
+        sql ="""insert into test_case_log(context,lines,file) values """#salary = 10000 where id = 4"""
+        for tuple in array:
+            sql +="('"+tuple[0]+"','"+tuple[1]+"','" + re.escape(tuple[2])+"'),"
 
         sql=sql[:-1]
         print (sql)
@@ -58,13 +59,13 @@ def insertSqliteTable(dict):
             #print("The SQLite connection is closed")
 
  
-def updateSqliteTable(dict):
+def updateSqliteTable(array):
     try:
         conn = create_connection(".DB")
         cursor = conn.cursor()
         sql = ""
-        for key in dict:
-            sql="Update test_case_log set lines = '"+dict[key]+"' where context = "+"'"+key+"';"
+        for tuple in array:
+            sql="Update test_case_log set lines = '"+tuple[1]+"',file = '" + tuple[2] +"'  where context = "+"'"+tuple[0]+"';"
             cursor.execute(sql)
         print (sql)
         
@@ -81,17 +82,26 @@ def updateSqliteTable(dict):
 
  
 
-def getLogs():
+def getLogs(file=""):
     rows=[]
+    
+   
+    #file="C:\Users\arsen\Desktop\porc\Kod.py"
+    #file=""
+    print(file)
     try:
         conn = create_connection(".DB")
         cur = conn.cursor()
-        cur.execute("SELECT * FROM test_case_log")
+        sql = "SELECT * FROM test_case_log "
+        if file:
+            sql+="where file = '"+ file+"'"
+        print(sql)
+        cur.execute(sql)
  
         rows = cur.fetchall()
- 
-        for row in rows:
-            print(row)
+        #print(rows)
+        #for row in rows:
+            #print(row)
         cur.close()
     except sqlite3.Error as error:
         print("Failed to select sqlite table", error)
