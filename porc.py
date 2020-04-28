@@ -17,7 +17,7 @@ if  len( sys.argv) == 1:
     #allTestModules = ["Test"]
     for module in allTestModules:
         utils.run_all_functions(cov,module)
-    utils.run_all_functions(cov,"Test")
+    #utils.run_all_functions(cov,"Test")
     allFiles = ["C:\\Users\\arsen\\Desktop\\porc\\Kod.py"]
     data = cov.get_data()
 
